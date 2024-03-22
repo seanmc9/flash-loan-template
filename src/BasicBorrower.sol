@@ -10,7 +10,6 @@ contract BasicBorrower {
 
     bytes32 public constant ERC3156PP_CALLBACK_SUCCESS = keccak256("ERC3156PP_CALLBACK_SUCCESS");
     IERC7399 lender;
-    LoanReceiver loanReceiver;
 
     uint256 public flashBalance;
     address public flashInitiator;
@@ -38,14 +37,10 @@ contract BasicBorrower {
         external
         returns (bytes memory)
     {
-        require(msg.sender == address(lender), "MockBorrower: Untrusted lender");
-        require(initiator == address(this), "MockBorrower: External loan initiator");
+        require(msg.sender == address(lender), "BasicBorrower: Untrusted lender");
+        require(initiator == address(this), "BasicBorrower: External loan initiator");
 
-        flashInitiator = initiator;
-        flashAsset = asset;
-        flashAmount = amount;
-        flashFee = fee;
-        loanReceiver.retrieve(asset);
+        /// BUSINESS LOGIC HERE
         flashBalance = IERC20(asset).balanceOf(address(this));
         IERC20(asset).safeTransfer(paymentReceiver, amount + fee);
 
