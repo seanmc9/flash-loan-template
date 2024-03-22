@@ -12,20 +12,16 @@ contract BasicBorrower {
     using SafeERC20 for IERC20;
 
     bytes32 public constant ERC3156PP_CALLBACK_SUCCESS = keccak256("ERC3156PP_CALLBACK_SUCCESS");
-    IERC7399 lender;
+    
+    IERC7399 public immutable LENDER;
+    address public immutable ASSET;
+    uint256 public immutable AMOUNT;
 
-    uint256 public flashBalance;
-    address public flashInitiator;
-    address public flashAsset;
-    uint256 public flashAmount;
-    uint256 public flashFee;
-
-    constructor(IERC7399 lender_) {
-        setLender(lender_);
-    }
-
-    function setLender(IERC7399 lender_) public {
-        lender = lender_;
+    constructor(IERC7399 lender_, address asset_, uint256 amount_) {
+        LENDER = lender_;
+        ASSET = asset_;
+        AMOUNT = amount_;
+        flashBorrow();
     }
 
     /// @dev Flash loan callback
@@ -40,7 +36,7 @@ contract BasicBorrower {
         external
         returns (bytes memory)
     {
-        require(msg.sender == address(lender), "BasicBorrower: Untrusted lender");
+        require(msg.sender == address(LENDER), "BasicBorrower: Untrusted lender");
         require(initiator == address(this), "BasicBorrower: External loan initiator");
 
         /// BUSINESS LOGIC HERE
@@ -50,7 +46,7 @@ contract BasicBorrower {
         return abi.encode(ERC3156PP_CALLBACK_SUCCESS);
     }
 
-    function flashBorrow(address asset, uint256 amount) public returns (bytes memory) {
-        return lender.flash(address(this), asset, amount, "", this.onFlashLoan);
+    function flashBorrow() private returns (bytes memory) {
+        return LENDER.flash(address(this), ASSET, AMOUNT, "", this.onFlashLoan);
     }
 }
