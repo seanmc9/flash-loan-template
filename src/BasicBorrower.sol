@@ -44,7 +44,7 @@ contract BasicBorrower {
         require(initiator == address(this), "BasicBorrower: External loan initiator");
 
         /// BUSINESS LOGIC HERE
-        flashBalance = IERC20(asset).balanceOf(address(this));
+
         IERC20(asset).safeTransfer(paymentReceiver, amount + fee);
 
         return abi.encode(ERC3156PP_CALLBACK_SUCCESS);
