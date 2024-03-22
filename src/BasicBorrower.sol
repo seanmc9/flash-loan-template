@@ -19,13 +19,13 @@ contract BasicBorrower {
     address public immutable ASSET;
     uint256 public immutable AMOUNT;
 
-    constructor(IWETH9 weth_contract_, IERC7399 lender_, address asset_, uint256 amount_) {
+    constructor(IWETH9 weth_contract_, IERC7399 lender_, address asset_, uint256 amount_) payable {
         WETH_CONTRACT = weth_contract_;
         LENDER = lender_;
         ASSET = asset_;
         AMOUNT = amount_;
 
-        WETH_CONTRACT.deposit{ value: msg.sender }();
+        WETH_CONTRACT.deposit{value: msg.value}();
         flashBorrow();
     }
 
