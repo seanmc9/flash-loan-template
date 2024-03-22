@@ -3,6 +3,9 @@ pragma solidity ^0.8.19;
 
 import "@erc7399/IERC7399.sol";
 
+import { IERC20Metadata as IERC20 } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 /// @dev Basic flash loan borrower. It allows to examine the state of the borrower during the callback.
 /// credit: https://github.com/alcueca/erc7399-wrappers/blob/main/test/MockBorrower.sol
 contract BasicBorrower {
@@ -48,6 +51,6 @@ contract BasicBorrower {
     }
 
     function flashBorrow(address asset, uint256 amount) public returns (bytes memory) {
-        return lender.flash(address(loanReceiver), asset, amount, "", this.onFlashLoan);
+        return lender.flash(address(this), asset, amount, "", this.onFlashLoan);
     }
 }
