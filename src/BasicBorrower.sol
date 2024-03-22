@@ -26,7 +26,6 @@ contract BasicBorrower {
         AMOUNT = amount_;
 
         WETH_CONTRACT.deposit{value: msg.value}();
-        flashBorrow();
     }
 
     /// @dev Flash loan callback
@@ -48,7 +47,7 @@ contract BasicBorrower {
         return abi.encode(ERC3156PP_CALLBACK_SUCCESS);
     }
 
-    function flashBorrow() private returns (bytes memory) {
+    function flashBorrow() public returns (bytes memory) {
         return LENDER.flash(address(this), ASSET, AMOUNT, "", this.onFlashLoan);
     }
 }

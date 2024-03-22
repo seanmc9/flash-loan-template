@@ -20,5 +20,7 @@ contract BasicBorrowerTest is Test {
         );
     }
 
-    function testBasicBorrower() public view {}
+    function testBasicBorrower() public {
+      basicBorrower.flashBorrow();
+    }
 }
