@@ -17,7 +17,7 @@ contract BasicBorrower {
     IWETH9 public immutable wethContract;
     IERC7399 public lender;
 
-    constructor(IWETH9 wethContract_, IERC7399 lender_) {
+    constructor(IWETH9 wethContract_, IERC7399 lender_) payable {
         wethContract = wethContract_;
         setLender(lender_);
     }
