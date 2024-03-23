@@ -13,19 +13,17 @@ contract BasicBorrower {
     using SafeERC20 for IERC20;
 
     bytes32 public constant ERC3156PP_CALLBACK_SUCCESS = keccak256("ERC3156PP_CALLBACK_SUCCESS");
+    
+    IWETH9 public immutable wethContract;
+    IERC7399 public lender;
 
-    IWETH9 public immutable WETH_CONTRACT;
-    IERC7399 public immutable LENDER;
-    address public immutable ASSET;
-    uint256 public immutable AMOUNT;
-
-    constructor(address weth_contract_, address lender_, address asset_, uint256 amount_) payable {
-        WETH_CONTRACT = IWETH9(payable(weth_contract_));
-        LENDER = IERC7399(lender_);
-        ASSET = asset_;
-        AMOUNT = amount_;
-
-        WETH_CONTRACT.deposit{value: msg.value}();
+    constructor(IWETH9 wethContract_, IERC7399 lender_) {
+        wethContract = wethContract_;
+        setLender(lender_);
+    }
+    
+    function setLender(IERC7399 lender_) public {
+        lender = lender_;
     }
 
     /// @dev Flash loan callback
@@ -37,17 +35,18 @@ contract BasicBorrower {
         uint256 fee,
         bytes calldata
     ) external returns (bytes memory) {
-        require(msg.sender == address(LENDER), "BasicBorrower: Untrusted lender");
+        require(msg.sender == address(lender), "BasicBorrower: Untrusted lender");
         require(initiator == address(this), "BasicBorrower: External loan initiator");
 
         /// BUSINESS LOGIC HERE
+        wethContract.deposit{value:address(this).balance}();
 
         IERC20(asset).safeTransfer(paymentReceiver, amount + fee);
 
         return abi.encode(ERC3156PP_CALLBACK_SUCCESS);
     }
 
-    function flashBorrow() public returns (bytes memory) {
-        return LENDER.flash(address(this), ASSET, AMOUNT, "", this.onFlashLoan);
+    function flashBorrow(address asset, uint256 amount) public returns (bytes memory) {
+        return lender.flash(address(this), asset, amount, "", this.onFlashLoan);
     }
 }
