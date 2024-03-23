@@ -17,11 +17,11 @@ contract BasicBorrowerTest is Test {
     function setUp() public {
         vm.createSelectFork({urlOrAlias: "https://rpc.ankr.com/polygon", blockNumber: 54_967_414});
 
-        basicBorrower = new BasicBorrower{salt: bytes32("83"), value: 5}(WETH_CONTRACT, LENDER); // salt added because the default address it was deployed to already had a balance at this forked block
+        basicBorrower = new BasicBorrower{salt: bytes32("83")}(WETH_CONTRACT, LENDER); // salt added because the default address it was deployed to already had a balance at this forked block
     }
 
     function testBasicBorrower() public {
-        basicBorrower.flashBorrow(
+        basicBorrower.flashBorrow{value: 5}(
             WETH_CONTRACT_ADDRESS, // WETH, WMATIC on Polygon
             LOAN_AMOUNT
         );

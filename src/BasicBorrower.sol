@@ -18,7 +18,7 @@ contract BasicBorrower {
     IWETH9 public immutable wethContract;
     IERC7399 public lender;
 
-    constructor(IWETH9 wethContract_, IERC7399 lender_) payable {
+    constructor(IWETH9 wethContract_, IERC7399 lender_) {
         wethContract = wethContract_;
         setLender(lender_);
     }
@@ -47,7 +47,7 @@ contract BasicBorrower {
         return abi.encode(ERC3156PP_CALLBACK_SUCCESS);
     }
 
-    function flashBorrow(address asset, uint256 amount) public returns (bytes memory) {
+    function flashBorrow(address asset, uint256 amount) public payable returns (bytes memory) {
         return lender.flash(address(this), asset, amount, "", this.onFlashLoan);
     }
 }
